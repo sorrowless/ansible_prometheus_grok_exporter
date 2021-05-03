@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Echo
+      debug:
+        msg: "Implement something useful here"
