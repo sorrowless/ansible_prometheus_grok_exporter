@@ -1,0 +1,71 @@
+---
+- name: Ensure unzip package to unpack grok exporter archive
+  apt:
+    name: unzip
+    state: present
+
+- name: Get grok exporter
+  become: yes
+  become_user: root
+  get_url:
+    url: "https://github.com/fstab/grok_exporter/releases/download/v{{ grok_exporter_version }}/grok_exporter-{{ grok_exporter_version }}.{{ grok_exporter_arch }}.zip"
+    dest: "{{ grok_exporter_config_dir }}/sources/grok_exporter-{{ grok_exporter_version }}.{{ grok_exporter_arch }}.zip"
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Unzip grok exporter
+  become: yes
+  become_user: root
+  unarchive:
+    remote_src: yes
+    src: "{{ grok_exporter_config_dir }}/sources/grok_exporter-{{ grok_exporter_version }}.{{ grok_exporter_arch }}.zip"
+    dest: "{{ grok_exporter_config_dir }}/sources/"
+    creates: "{{ grok_exporter_config_dir }}/sources/grok_exporter-{{ grok_exporter_version }}.{{ grok_exporter_arch }}/grok_exporter"
+
+- name: Copy exporter to PATH
+  become: yes
+  become_user: root
+  copy:
+    remote_src: yes
+    src: "{{ grok_exporter_config_dir }}/sources/grok_exporter-{{ grok_exporter_version }}.{{ grok_exporter_arch }}/grok_exporter"
+    dest: /usr/local/bin/grok_exporter
+    mode: 0755
+    owner: root
+    group: root
+  register: exporter_executable
+
+- name: Copy default patterns to conf dir
+  copy:
+    remote_src: yes
+    src: "{{ grok_exporter_config_dir }}/sources/grok_exporter-{{ grok_exporter_version }}.{{ grok_exporter_arch }}/patterns/"
+    dest: "{{ grok_exporter_patterns_dir }}/"
+    mode: 0755
+    owner: root
+    group: root
+  register: exporter_default_patterns
+
+- name: Copy non-default patterns to conf dir
+  copy:
+    remote_src: no
+    src: "patterns/"
+    dest: "{{ grok_exporter_patterns_dir }}/"
+    mode: 0755
+    owner: root
+    group: root
+  register: exporter_non_default_patterns
+
+- name: Create grok exporter user
+  user:
+    name: "{{ grok_exporter_user }}"
+    append: yes
+    groups:
+      - adm
+    comment: "grok exporter user"
+    shell: /usr/sbin/nologin
+
+- name: Include grok exporter configuration tasks
+  include_tasks: configure_standalone.yml
+  loop: "{{ grok_exporter_configs }}"
+  loop_control:
+    loop_var: exporter

@@ -1,0 +1,17 @@
+---
+- name: Ensure config dir
+  become: yes
+  become_user: root
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: root
+    group: root
+  with_items:
+    - "{{ grok_exporter_config_dir }}"
+    - "{{ grok_exporter_config_dir }}/sources"
+    - "{{ grok_exporter_patterns_dir }}"
+
+- name: Include standalone tasks
+  import_tasks: run_standalone.yml

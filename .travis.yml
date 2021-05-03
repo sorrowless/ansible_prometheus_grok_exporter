@@ -1,0 +1,27 @@
+---
+dist: bionic
+language: python
+services: docker
+
+env:
+  global:
+    - ROLE_NAME: prometheus_grok_exporter
+  matrix:
+    - MOLECULE_DISTRO: ubuntu2004
+
+install:
+  # Install test dependencies.
+  - pip install molecule[docker] yamllint ansible-lint docker ansible==2.10
+
+before_script:
+  # Use actual Ansible Galaxy role name for the project directory.
+  - cd ../
+  - mv ansible_$ROLE_NAME sorrowless.$ROLE_NAME
+  - cd sorrowless.$ROLE_NAME
+
+script:
+  # Run tests.
+  - molecule syntax
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/?branch=master

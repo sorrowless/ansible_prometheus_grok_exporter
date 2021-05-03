@@ -1,0 +1,40 @@
+---
+- name: Copy grok config file
+  template:
+    src: config.yml.j2
+    dest: "{{ grok_exporter_config_dir }}/{{ exporter.name }}_config.yml"
+    mode: 0644
+    owner: root
+    group: root
+  register: config
+
+- name: Ensure grok exporter systemd unit
+  become: yes
+  become_user: root
+  template:
+    src: systemd.service.j2
+    dest: "/etc/systemd/system/grok-exporter-{{ exporter.name }}.service"
+    owner: root
+    group: root
+    mode: 0644
+  register: systemd_unitfile
+
+- name: Enable systemd service
+  become: yes
+  become_user: root
+  systemd:
+    name: "grok-exporter-{{ exporter.name }}.service"
+    enabled: yes
+    daemon_reload: yes
+    state: started
+  when:
+    - systemd_unitfile.changed
+
+- name: Restart systemd service
+  become: yes
+  become_user: root
+  systemd:
+    name: "grok-exporter-{{ exporter.name }}.service"
+    state: restarted
+  when:
+    - config.changed or systemd_unitfile.changed or exporter_executable.changed or exporter_default_patterns.changed or exporter_non_default_patterns.changed
