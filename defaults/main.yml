@@ -55,3 +55,21 @@ grok_exporter_configs: []
 #     server:
 #       host: localhost
 #       port: 9145
+# - name: monitor_journald
+#   If input type is stdin, pre_command must be set
+#   pre_command: "journalctl -f -u some_unit | "
+#   config:
+#     global:
+#       config_version: 3
+#       retention_check_interval: 53s
+#     input:
+#       type: stdin
+#     metrics:
+#       - type: counter
+#         name: some_err
+#         help: Some errors counter
+#         match: 'Error'
+#     server:
+#       host: 127.0.0.1
+#       port: 9146
+
