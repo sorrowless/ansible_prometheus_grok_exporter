@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User={{ grok_exporter_user }}
 Group={{ grok_exporter_user }}
-ExecStart=/usr/local/bin/grok_exporter -config {{ grok_exporter_config_dir }}/{{ exporter.name }}_config.yml
+ExecStart=sh -c "{{ exporter.pre_command | default('') }}/usr/local/bin/grok_exporter -config {{ grok_exporter_config_dir }}/{{ exporter.name }}_config.yml"
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true
 Restart=on-failure
