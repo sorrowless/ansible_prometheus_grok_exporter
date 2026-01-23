@@ -6,6 +6,7 @@ grok_exporter_version: '1.0.0.RC5'
 grok_exporter_arch: linux-amd64
 grok_exporter_metrics_path: metrics
 grok_exporter_user: grok
+grok_exporter_groups: grok
 grok_exporter_configs: []
 # - name: nginx_access
 #   # For config example look at https://github.com/fstab/grok_exporter/blob/master/example/config.yml

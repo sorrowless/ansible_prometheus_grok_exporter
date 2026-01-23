@@ -59,8 +59,7 @@
   user:
     name: "{{ grok_exporter_user }}"
     append: yes
-    groups:
-      - adm
+    groups: "{{ grok_exporter_groups }}"
     comment: "grok exporter user"
     shell: /usr/sbin/nologin
 
